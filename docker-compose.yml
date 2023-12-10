@@ -1,0 +1,39 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16
+    container_name: adlive_db
+    volumes:
+      - db:/data/db
+    env_file: ./.env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - '${DB_PORT}:5432'
+    networks:
+      - backend
+
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: redis-server --requirepass  ${REDIS_PASSWORD}
+    volumes:
+      - redis:/data
+    env_file:
+      - .env
+    networks:
+      - backend
+
+
+volumes:
+  db:
+  redis:
+
+
+networks:
+  backend:
+    driver: bridge
